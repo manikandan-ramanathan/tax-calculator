@@ -187,7 +187,7 @@
                             </div>
                         </div>
                         <div class="space-y-3 text-sm flex-grow">
-                             <div id="oldDeductionsDisplay" class="breakdown-section"></div>
+                             <div id="oldDeductionsDisplay" class="breakdown-section mb-4"></div>
                              
                              <div class="flex justify-between items-center">
                                 <span class="text-slate-600">Taxable Income:</span>
@@ -246,7 +246,7 @@
                             </div>
                         </div>
                          <div class="space-y-3 text-sm flex-grow">
-                            <div id="newDeductionsDisplay" class="breakdown-section"></div>
+                            <div id="newDeductionsDisplay" class="breakdown-section mb-4"></div>
 
                             <div class="flex justify-between items-center">
                                 <span class="text-slate-600">Taxable Income:</span>
@@ -381,23 +381,35 @@
 
             const formatToRupee = (num) => `₹ ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
             
-            const populateBreakdown = (container, title, data) => {
+            const populateDeductionsTable = (container, title, data) => {
                 container.innerHTML = '';
                 const entries = Object.entries(data).filter(([_, value]) => value > 0);
 
                 if (entries.length === 0) return;
 
-                let html = `<h4>${title}</h4><div class="space-y-1">`;
+                let tableHTML = `
+                    <h4 class="text-sm font-semibold text-indigo-800 mb-2">${title}</h4>
+                    <table class="w-full text-xs border-collapse">
+                        <thead class="bg-slate-200">
+                            <tr>
+                                <th class="p-2 text-left font-semibold text-slate-700 rounded-tl-lg">Component</th>
+                                <th class="p-2 text-right font-semibold text-slate-700 rounded-tr-lg">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
                 for (const [key, value] of entries) {
-                    html += `
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">${key}</span>
-                            <span class="breakdown-value">${formatToRupee(value)}</span>
-                        </div>
+                    tableHTML += `
+                        <tr class="border-b border-slate-200 last:border-b-0">
+                            <td class="p-2 text-slate-600">${key}</td>
+                            <td class="p-2 text-right font-medium text-slate-800">${formatToRupee(value)}</td>
+                        </tr>
                     `;
                 }
-                html += '</div>';
-                container.innerHTML = html;
+                
+                tableHTML += `</tbody></table>`;
+                container.innerHTML = tableHTML;
             };
             
             const populateOverInvestmentsTable = (data) => {
@@ -506,7 +518,7 @@
                 const totalDeductionsOld = Object.values(appliedDeductionsOld).reduce((sum, val) => sum + val, 0);
                 const oldTaxableIncome = Math.max(0, grossSalary - totalDeductionsOld);
                 
-                populateBreakdown(oldRegimeDisplays.deductions, 'Deductions Applied', appliedDeductionsOld);
+                populateDeductionsTable(oldRegimeDisplays.deductions, 'Deductions Applied', appliedDeductionsOld);
                 
                 const oldResult = calculateTax(oldTaxableIncome, 'old');
                 const oldNetSalary = grossSalary - employeePF - professionalTax - oldResult.totalTax;
@@ -522,7 +534,7 @@
                 const appliedDeductionsNew = { 'Standard Deduction': 50000 };
                 const newTaxableIncome = Math.max(0, grossSalary - appliedDeductionsNew['Standard Deduction']);
                 
-                populateBreakdown(newRegimeDisplays.deductions, 'Deductions Applied', appliedDeductionsNew);
+                populateDeductionsTable(newRegimeDisplays.deductions, 'Deductions Applied', appliedDeductionsNew);
                 
                 const newResult = calculateTax(newTaxableIncome, 'new');
                 const newNetSalary = grossSalary - employeePF - professionalTax - newResult.totalTax;
