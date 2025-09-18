@@ -24,7 +24,18 @@
         .result-card {
             @apply bg-white p-6 rounded-lg shadow-md border border-slate-200 flex flex-col;
         }
-        /* .recommended-badge rule removed */
+        .breakdown-section h4 {
+            @apply text-sm font-semibold text-indigo-800 mb-2;
+        }
+        .breakdown-row {
+            @apply flex justify-between items-center text-xs py-1 border-b border-slate-100;
+        }
+        .breakdown-label {
+            @apply text-slate-600;
+        }
+        .breakdown-value {
+             @apply font-medium text-slate-800;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 p-4 sm:p-6 md:p-8">
@@ -40,11 +51,15 @@
             <div class="lg:col-span-1 space-y-8">
                 <!-- Salary Section -->
                 <section id="salary" class="bg-white p-6 rounded-lg shadow-md gradient-border">
-                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Salary & Income</h2>
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Yearly Salary & Income</h2>
                     <div class="space-y-4">
                         <div>
                             <label for="basicSalary" class="block text-sm font-medium text-slate-700 mb-1">Basic Salary (Yearly)</label>
                             <input type="number" id="basicSalary" class="form-input" placeholder="e.g., 600000">
+                        </div>
+                        <div>
+                            <label for="dearnessAllowance" class="block text-sm font-medium text-slate-700 mb-1">Dearness Allowance (Yearly)</label>
+                            <input type="number" id="dearnessAllowance" class="form-input" placeholder="e.g., 50000">
                         </div>
                         <div>
                             <label for="hra" class="block text-sm font-medium text-slate-700 mb-1">HRA Received (Yearly)</label>
@@ -77,7 +92,7 @@
 
                 <!-- Deductions Section -->
                 <section class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Deductions</h2>
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Yearly Deductions</h2>
                      <div class="space-y-4">
                         <div>
                             <label for="lta" class="block text-sm font-medium text-slate-700 mb-1">Leave Travel Allowance (LTA)</label>
@@ -97,8 +112,9 @@
                         </div>
                         <hr>
                         <div>
-                            <label for="deduction80c" class="block text-sm font-medium text-slate-700 mb-1">80C (EPF, PPF, Insurance, etc.)</label>
+                            <label for="deduction80c" class="block text-sm font-medium text-slate-700 mb-1">80C Investments (PPF, Insurance, etc.)</label>
                              <input type="number" id="deduction80c" class="form-input" placeholder="Max 150,000">
+                             <p class="text-xs text-slate-500 mt-1">(Your EPF contribution is auto-included)</p>
                         </div>
                          <div>
                             <label for="nps80ccd" class="block text-sm font-medium text-slate-700 mb-1">80CCD(1B) (NPS Contribution)</label>
@@ -139,7 +155,7 @@
                     <h3 class="text-lg font-medium text-slate-600">Total Gross Annual Salary</h3>
                     <p id="grossSalaryValue" class="text-3xl font-bold text-indigo-700 mt-1">₹ 0</p>
                 </div>
-                 <div id="results" class="grid grid-cols-1 md-grid-cols-2 gap-8">
+                 <div id="results" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Old Regime Card -->
                     <div id="oldRegimeCard" class="result-card">
                         <div class="flex justify-between items-center mb-4">
@@ -149,6 +165,8 @@
                             </div>
                         </div>
                         <div class="space-y-3 text-sm flex-grow">
+                             <div id="oldDeductionsDisplay" class="breakdown-section"></div>
+                             
                              <div class="flex justify-between items-center">
                                 <span class="text-slate-600">Taxable Income:</span>
                                 <span id="oldTaxableIncome" class="font-semibold text-slate-800">₹ 0</span>
@@ -206,6 +224,8 @@
                             </div>
                         </div>
                          <div class="space-y-3 text-sm flex-grow">
+                            <div id="newDeductionsDisplay" class="breakdown-section"></div>
+
                             <div class="flex justify-between items-center">
                                 <span class="text-slate-600">Taxable Income:</span>
                                 <span id="newTaxableIncome" class="font-semibold text-slate-800">₹ 0</span>
@@ -254,6 +274,14 @@
                         <div id="newSlabTableContainer" class="slab-table-container"></div>
                     </div>
                  </div>
+
+                 <!-- Over Investments Section -->
+                 <div id="overInvestmentsSection" class="hidden">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4 text-center">Over Investments Summary</h3>
+                    <div class="bg-white p-4 rounded-lg shadow-md border border-slate-200">
+                        <table id="overInvestmentsTable" class="w-full text-sm border-collapse"></table>
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -267,7 +295,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // --- Element Selection ---
             const allInputs = [
-                'basicSalary', 'hra', 'otherAllowances', 'lta', 'rentPaid', 'isMetro',
+                'basicSalary', 'dearnessAllowance', 'hra', 'otherAllowances', 'lta', 'rentPaid', 'isMetro',
                 'deduction80c', 'nps80ccd', 'deduction80d', 'homeLoanInterest',
                 'educationLoanInterest', 'savingsInterest', 'donations80g'
             ].reduce((acc, id) => ({ ...acc, [id]: document.getElementById(id) }), {});
@@ -296,7 +324,8 @@
                 monthlyTax: document.getElementById('oldMonthlyTax'),
                 monthlyTakeHome: document.getElementById('oldMonthlyTakeHome'),
                 tableContainer: document.getElementById('oldSlabTableContainer'),
-                rec: document.getElementById('oldRec')
+                rec: document.getElementById('oldRec'),
+                deductions: document.getElementById('oldDeductionsDisplay'),
             };
 
             const newRegimeDisplays = {
@@ -311,30 +340,85 @@
                 monthlyTax: document.getElementById('newMonthlyTax'),
                 monthlyTakeHome: document.getElementById('newMonthlyTakeHome'),
                 tableContainer: document.getElementById('newSlabTableContainer'),
-                rec: document.getElementById('newRec')
+                rec: document.getElementById('newRec'),
+                deductions: document.getElementById('newDeductionsDisplay'),
             };
-
+            
+            const overInvestmentsSection = document.getElementById('overInvestmentsSection');
+            const overInvestmentsTable = document.getElementById('overInvestmentsTable');
             const calculateBtn = document.getElementById('calculateBtn');
             const resetBtn = document.getElementById('resetBtn');
 
             const formatToRupee = (num) => `₹ ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+            
+            const populateBreakdown = (container, title, data) => {
+                container.innerHTML = '';
+                const entries = Object.entries(data).filter(([_, value]) => value > 0);
+
+                if (entries.length === 0) return;
+
+                let html = `<h4>${title}</h4><div class="space-y-1">`;
+                for (const [key, value] of entries) {
+                    html += `
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">${key}</span>
+                            <span class="breakdown-value">${formatToRupee(value)}</span>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            };
+            
+            const populateOverInvestmentsTable = (data) => {
+                const entries = Object.entries(data).filter(([_, value]) => value > 0);
+                
+                if (entries.length === 0) {
+                    overInvestmentsSection.classList.add('hidden');
+                    return;
+                }
+
+                overInvestmentsSection.classList.remove('hidden');
+
+                let tableHTML = `
+                    <thead class="bg-slate-200">
+                        <tr>
+                            <th class="p-2 text-left font-semibold text-slate-700 rounded-tl-lg">Deduction Section</th>
+                            <th class="p-2 text-right font-semibold text-slate-700 rounded-tr-lg">Amount Over Limit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                for (const [key, value] of entries) {
+                    tableHTML += `
+                        <tr class="border-b border-slate-200 last:border-b-0">
+                            <td class="p-2 text-slate-600">${key}</td>
+                            <td class="p-2 text-right font-medium text-slate-800">${formatToRupee(value)}</td>
+                        </tr>
+                    `;
+                }
+                
+                tableHTML += `</tbody>`;
+                overInvestmentsTable.innerHTML = tableHTML;
+            };
 
             const calculate = () => {
                 const basicSalary = Number(allInputs.basicSalary.value) || 0;
                 if (basicSalary === 0) {
-                     // Using a custom modal/alert would be better, but for simplicity:
                     alert('Please enter a Basic Salary to calculate.');
                     return;
                 }
                 
+                const dearnessAllowance = Number(allInputs.dearnessAllowance.value) || 0;
                 const hraReceived = Number(allInputs.hra.value) || 0;
                 const otherAllowances = Number(allInputs.otherAllowances.value) || 0;
-                const ltaExemption = Number(allInputs.lta.value) || 0;
 
                 // --- Common Calculations ---
-                const grossSalary = basicSalary + hraReceived + otherAllowances;
-                const employeePF = Math.min(basicSalary * 0.12, 21600); // 12% of basic, capped at 1800/month
-                const employerPF = Math.min(basicSalary * 0.12, 21600);
+                const salaryForPfAndHra = basicSalary + dearnessAllowance;
+                const grossSalary = salaryForPfAndHra + hraReceived + otherAllowances;
+                const employeePF = Math.min(salaryForPfAndHra * 0.12, 21600); // 12% of basic+DA, capped at 1800/month
+                const employerPF = Math.min(salaryForPfAndHra * 0.12, 21600);
                 const professionalTax = 2400;
 
                 readOnlyDisplays.grossSalary.value = formatToRupee(grossSalary);
@@ -345,30 +429,54 @@
                 grossSalaryDisplay.container.classList.remove('hidden');
                 grossSalaryDisplay.value.textContent = formatToRupee(grossSalary);
 
+                // --- User Inputs for Deductions ---
+                const userInput = {
+                    lta: Number(allInputs.lta.value) || 0,
+                    rentPaid: Number(allInputs.rentPaid.value) || 0,
+                    '80c': Number(allInputs.deduction80c.value) || 0,
+                    nps: Number(allInputs.nps80ccd.value) || 0,
+                    '80d': Number(allInputs.deduction80d.value) || 0,
+                    homeLoan: Number(allInputs.homeLoanInterest.value) || 0,
+                    eduLoan: Number(allInputs.educationLoanInterest.value) || 0,
+                    savings: Number(allInputs.savingsInterest.value) || 0,
+                    donations: Number(allInputs.donations80g.value) || 0,
+                };
+                
+                // --- Calculate and Display Over Investments ---
+                const overInvestmentsData = {
+                    '80C (Limit: ₹1,50,000)': Math.max(0, (userInput['80c'] + employeePF) - 150000),
+                    'NPS 80CCD(1B) (Limit: ₹50,000)': Math.max(0, userInput.nps - 50000),
+                    '80D Medical (Limit: ₹25,000)': Math.max(0, userInput['80d'] - 25000), // Assuming non-senior
+                    'Home Loan Int. (Limit: ₹2,00,000)': Math.max(0, userInput.homeLoan - 200000),
+                    'Savings Int. (Limit: ₹10,000)': Math.max(0, userInput.savings - 10000),
+                };
+                populateOverInvestmentsTable(overInvestmentsData);
+
                 // --- Old Regime Calculation ---
-                const rentPaid = Number(allInputs.rentPaid.value) || 0;
                 const hraExemption = Math.max(0, Math.min(
                     hraReceived,
-                    rentPaid - (basicSalary * 0.10),
-                    allInputs.isMetro.checked ? (basicSalary * 0.50) : (basicSalary * 0.40)
+                    userInput.rentPaid - (salaryForPfAndHra * 0.10),
+                    allInputs.isMetro.checked ? (salaryForPfAndHra * 0.50) : (salaryForPfAndHra * 0.40)
                 ));
-
-                const salaryAfterExemptions = grossSalary - hraExemption - ltaExemption;
                 
-                const deductions = {
-                    standard: 50000,
-                    '80c': Math.min((Number(allInputs.deduction80c.value) || 0) + employeePF, 150000),
-                    nps: Math.min(Number(allInputs.nps80ccd.value) || 0, 50000),
-                    '80d': Math.min(Number(allInputs.deduction80d.value) || 0, 25000), // Assuming non-senior
-                    homeLoan: Math.min(Number(allInputs.homeLoanInterest.value) || 0, 200000),
-                    eduLoan: Number(allInputs.educationLoanInterest.value) || 0,
-                    savings: Math.min(Number(allInputs.savingsInterest.value) || 0, 10000),
-                    donations: Number(allInputs.donations80g.value) || 0, // Note: 80G has complex rules, simplifying here
-                    profTax: professionalTax
+                const appliedDeductionsOld = {
+                    'Standard Deduction': 50000,
+                    'HRA Exemption': hraExemption,
+                    'LTA Exemption': userInput.lta,
+                    'Professional Tax': professionalTax,
+                    '80C': Math.min(150000, userInput['80c'] + employeePF),
+                    'NPS 80CCD(1B)': Math.min(50000, userInput.nps),
+                    '80D Medical': Math.min(25000, userInput['80d']), 
+                    'Home Loan Interest': Math.min(200000, userInput.homeLoan),
+                    'Education Loan Interest': userInput.eduLoan,
+                    'Savings Interest 80TTA': Math.min(10000, userInput.savings),
+                    'Donations 80G': userInput.donations, 
                 };
 
-                const totalDeductionsOld = Object.values(deductions).reduce((sum, val) => sum + val, 0);
-                const oldTaxableIncome = Math.max(0, salaryAfterExemptions - totalDeductionsOld + deductions.profTax);
+                const totalDeductionsOld = Object.values(appliedDeductionsOld).reduce((sum, val) => sum + val, 0);
+                const oldTaxableIncome = Math.max(0, grossSalary - totalDeductionsOld);
+                
+                populateBreakdown(oldRegimeDisplays.deductions, 'Deductions Applied', appliedDeductionsOld);
                 
                 const oldResult = calculateTax(oldTaxableIncome, 'old');
                 const oldNetSalary = grossSalary - employeePF - professionalTax - oldResult.totalTax;
@@ -381,9 +489,10 @@
                 generateSlabTable(oldRegimeDisplays.tableContainer, oldTaxableIncome, 'old');
 
                 // --- New Regime Calculation ---
-                // Employer's NPS contribution is also deductible under new regime
-                const newDeductions = 50000;
-                const newTaxableIncome = Math.max(0, grossSalary - newDeductions);
+                const appliedDeductionsNew = { 'Standard Deduction': 50000 };
+                const newTaxableIncome = Math.max(0, grossSalary - appliedDeductionsNew['Standard Deduction']);
+                
+                populateBreakdown(newRegimeDisplays.deductions, 'Deductions Applied', appliedDeductionsNew);
                 
                 const newResult = calculateTax(newTaxableIncome, 'new');
                 const newNetSalary = grossSalary - employeePF - professionalTax - newResult.totalTax;
@@ -539,7 +648,7 @@
                     totalTaxCalculated += taxInSlab;
                     
                     const row = tbody.insertRow();
-                    row.className = 'border-b border-slate-200';
+                    row.className = 'border-b border-slate-200 last:border-b-0';
                     row.innerHTML = `
                         <td class="p-2">${slab.text} <span class="text-slate-500">(${slab.rate * 100}%)</span></td>
                         <td class="p-2 text-right">${formatToRupee(taxableInSlab)}</td>
@@ -586,8 +695,11 @@
                     updateResultUI(uiSet, 0, { tax: 0, surcharge: 0, cess: 0, totalTax: 0 }, 0, { monthlyGross: 0, monthlyTax: 0, monthlyTakeHome: 0 });
                     uiSet.tableContainer.innerHTML = '';
                     uiSet.rec.classList.add('hidden');
+                    uiSet.deductions.innerHTML = '';
                 });
                 
+                overInvestmentsSection.classList.add('hidden');
+                overInvestmentsTable.innerHTML = '';
                 allInputs.basicSalary.focus();
             };
 
@@ -597,8 +709,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 
