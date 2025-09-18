@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Tax Calculator 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-border {
+            border: 2px solid;
+            border-image-slice: 1;
+            border-image-source: linear-gradient(to right, #4f46e5, #ec4899);
+        }
+        .form-input {
+            @apply w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out;
+        }
+        .read-only-input {
+            @apply form-input bg-slate-200 cursor-not-allowed text-slate-500;
+        }
+        .result-card {
+            @apply bg-white p-6 rounded-lg shadow-md border border-slate-200 flex flex-col;
+        }
+        /* .recommended-badge rule removed */
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">Indian Income Tax Calculator</h1>
+            <p class="text-slate-600 mt-2">For Financial Year 2024-25 (Assessment Year 2025-26)</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Inputs -->
+            <div class="lg:col-span-1 space-y-8">
+                <!-- Salary Section -->
+                <section id="salary" class="bg-white p-6 rounded-lg shadow-md gradient-border">
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Salary & Income</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="basicSalary" class="block text-sm font-medium text-slate-700 mb-1">Basic Salary (Yearly)</label>
+                            <input type="number" id="basicSalary" class="form-input" placeholder="e.g., 600000">
+                        </div>
+                        <div>
+                            <label for="hra" class="block text-sm font-medium text-slate-700 mb-1">HRA Received (Yearly)</label>
+                            <input type="number" id="hra" class="form-input" placeholder="e.g., 240000">
+                        </div>
+                        <div>
+                            <label for="otherAllowances" class="block text-sm font-medium text-slate-700 mb-1">Other Allowances (Yearly)</label>
+                            <input type="number" id="otherAllowances" class="form-input" placeholder="e.g., 50000">
+                        </div>
+                        <div class="pt-4 grid grid-cols-1 gap-4">
+                            <div>
+                                <label for="grossSalary" class="block text-sm font-medium text-slate-700 mb-1">Gross Salary</label>
+                                <input type="text" id="grossSalary" class="read-only-input" readonly>
+                            </div>
+                            <div>
+                                <label for="employeePF" class="block text-sm font-medium text-slate-700 mb-1">Employee PF (12%)</label>
+                                <input type="text" id="employeePF" class="read-only-input" readonly>
+                            </div>
+                             <div>
+                                <label for="employerPF" class="block text-sm font-medium text-slate-700 mb-1">Employer PF (12%)</label>
+                                <input type="text" id="employerPF" class="read-only-input" readonly>
+                            </div>
+                             <div>
+                                <label for="professionalTax" class="block text-sm font-medium text-slate-700 mb-1">Professional Tax</label>
+                                <input type="text" id="professionalTax" class="read-only-input" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Deductions Section -->
+                <section class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Deductions</h2>
+                     <div class="space-y-4">
+                        <div>
+                            <label for="lta" class="block text-sm font-medium text-slate-700 mb-1">Leave Travel Allowance (LTA)</label>
+                             <input type="number" id="lta" class="form-input" placeholder="Exempt amount">
+                        </div>
+                        <div>
+                            <label for="rentPaid" class="block text-sm font-medium text-slate-700 mb-1">Total Rent Paid (Yearly for HRA)</label>
+                            <input type="number" id="rentPaid" class="form-input" placeholder="e.g., 300000">
+                        </div>
+                         <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="isMetro" name="isMetro" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="isMetro" class="font-medium text-gray-700">Live in a Metro city?</label>
+                            </div>
+                        </div>
+                        <hr>
+                        <div>
+                            <label for="deduction80c" class="block text-sm font-medium text-slate-700 mb-1">80C (EPF, PPF, Insurance, etc.)</label>
+                             <input type="number" id="deduction80c" class="form-input" placeholder="Max 150,000">
+                        </div>
+                         <div>
+                            <label for="nps80ccd" class="block text-sm font-medium text-slate-700 mb-1">80CCD(1B) (NPS Contribution)</label>
+                             <input type="number" id="nps80ccd" class="form-input" placeholder="Max 50,000">
+                        </div>
+                        <div>
+                            <label for="deduction80d" class="block text-sm font-medium text-slate-700 mb-1">80D (Medical Insurance)</label>
+                             <input type="number" id="deduction80d" class="form-input" placeholder="e.g., 25,000">
+                        </div>
+                        <div>
+                            <label for="homeLoanInterest" class="block text-sm font-medium text-slate-700 mb-1">Sec 24b (Home Loan Interest)</label>
+                             <input type="number" id="homeLoanInterest" class="form-input" placeholder="Max 200,000">
+                        </div>
+                        <div>
+                            <label for="educationLoanInterest" class="block text-sm font-medium text-slate-700 mb-1">80E (Education Loan Interest)</label>
+                             <input type="number" id="educationLoanInterest" class="form-input" placeholder="Actual interest paid">
+                        </div>
+                         <div>
+                            <label for="savingsInterest" class="block text-sm font-medium text-slate-700 mb-1">80TTA (Savings Account Interest)</label>
+                             <input type="number" id="savingsInterest" class="form-input" placeholder="Max 10,000">
+                        </div>
+                         <div>
+                            <label for="donations80g" class="block text-sm font-medium text-slate-700 mb-1">80G (Donations)</label>
+                             <input type="number" id="donations80g" class="form-input" placeholder="Amount donated">
+                        </div>
+                    </div>
+                </section>
+                
+                <div class="flex space-x-4">
+                    <button id="calculateBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-sm">Calculate</button>
+                    <button id="resetBtn" class="w-full bg-slate-500 text-white font-semibold py-3 px-4 rounded-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition duration-150 ease-in-out shadow-sm">Reset</button>
+                </div>
+            </div>
+
+            <!-- Right Column: Results -->
+            <div class="lg:col-span-2 space-y-8">
+                 <div id="grossSalaryDisplay" class="text-center mb-6 bg-white p-4 rounded-lg shadow-md hidden">
+                    <h3 class="text-lg font-medium text-slate-600">Total Gross Annual Salary</h3>
+                    <p id="grossSalaryValue" class="text-3xl font-bold text-indigo-700 mt-1">₹ 0</p>
+                </div>
+                 <div id="results" class="grid grid-cols-1 md-grid-cols-2 gap-8">
+                    <!-- Old Regime Card -->
+                    <div id="oldRegimeCard" class="result-card">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-2xl font-bold text-indigo-700">Old Regime</h3>
+                            <div id="oldRec" class="bg-green-500 text-black text-sm font-bold px-3 py-1 rounded-md hidden">
+                                Recommended
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-sm flex-grow">
+                             <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Taxable Income:</span>
+                                <span id="oldTaxableIncome" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                            <hr>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Income Tax:</span>
+                                <span id="oldTax" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Surcharge:</span>
+                                <span id="oldSurcharge" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Health & Edu Cess (4%):</span>
+                                <span id="oldCess" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                            <hr class="my-2 border-t-2 border-slate-300">
+                             <div class="flex justify-between items-center text-lg">
+                                <span class="font-bold text-slate-800">Total Tax Payable:</span>
+                                <span id="oldTotalTax" class="font-bold text-red-600">₹ 0</span>
+                            </div>
+                            <hr class="my-2">
+                             <div class="flex justify-between items-center text-base mt-4">
+                                <span class="font-semibold text-slate-600">Net Take-Home Salary:</span>
+                                <span id="oldNetSalary" class="font-bold text-green-600">₹ 0</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Yearly Tax Paid:</span>
+                                <span id="oldYearlyTax" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Monthly Gross:</span>
+                                <span id="oldMonthlyGross" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Monthly Tax:</span>
+                                <span id="oldMonthlyTax" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Monthly Take-Home:</span>
+                                <span id="oldMonthlyTakeHome" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                        </div>
+                        <div id="oldSlabTableContainer" class="slab-table-container"></div>
+                    </div>
+
+                    <!-- New Regime Card -->
+                    <div id="newRegimeCard" class="result-card">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-2xl font-bold text-indigo-700">New Regime</h3>
+                            <div id="newRec" class="bg-green-500 text-black text-sm font-bold px-3 py-1 rounded-md hidden">
+                                Recommended
+                            </div>
+                        </div>
+                         <div class="space-y-3 text-sm flex-grow">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Taxable Income:</span>
+                                <span id="newTaxableIncome" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                            <hr>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Income Tax:</span>
+                                <span id="newTax" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                             <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Surcharge:</span>
+                                <span id="newSurcharge" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Health & Edu Cess (4%):</span>
+                                <span id="newCess" class="font-semibold text-slate-800">₹ 0</span>
+                            </div>
+                             <hr class="my-2 border-t-2 border-slate-300">
+                             <div class="flex justify-between items-center text-lg">
+                                <span class="font-bold text-slate-800">Total Tax Payable:</span>
+                                <span id="newTotalTax" class="font-bold text-red-600">₹ 0</span>
+                            </div>
+                             <hr class="my-2">
+                             <div class="flex justify-between items-center text-base mt-4">
+                                <span class="font-semibold text-slate-600">Net Take-Home Salary:</span>
+                                <span id="newNetSalary" class="font-bold text-green-600">₹ 0</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Yearly Tax Paid:</span>
+                                <span id="newYearlyTax" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Monthly Gross:</span>
+                                <span id="newMonthlyGross" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Monthly Tax:</span>
+                                <span id="newMonthlyTax" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500">Monthly Take-Home:</span>
+                                <span id="newMonthlyTakeHome" class="font-semibold text-slate-700">₹ 0</span>
+                            </div>
+                        </div>
+                        <div id="newSlabTableContainer" class="slab-table-container"></div>
+                    </div>
+                 </div>
+            </div>
+        </main>
+
+        <footer class="text-center text-slate-500 text-sm mt-12">
+            <p>Disclaimer: This calculator is for illustrative purposes only. Please consult a financial advisor for accurate tax planning.</p>
+            <p>Calculations based on FY 2024-25 tax slabs. Professional Tax is assumed at ₹2,400 per year.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Element Selection ---
+            const allInputs = [
+                'basicSalary', 'hra', 'otherAllowances', 'lta', 'rentPaid', 'isMetro',
+                'deduction80c', 'nps80ccd', 'deduction80d', 'homeLoanInterest',
+                'educationLoanInterest', 'savingsInterest', 'donations80g'
+            ].reduce((acc, id) => ({ ...acc, [id]: document.getElementById(id) }), {});
+
+            const readOnlyDisplays = {
+                grossSalary: document.getElementById('grossSalary'),
+                employeePF: document.getElementById('employeePF'),
+                employerPF: document.getElementById('employerPF'),
+                professionalTax: document.getElementById('professionalTax')
+            };
+
+            const grossSalaryDisplay = {
+                container: document.getElementById('grossSalaryDisplay'),
+                value: document.getElementById('grossSalaryValue')
+            };
+
+            const oldRegimeDisplays = {
+                taxableIncome: document.getElementById('oldTaxableIncome'),
+                tax: document.getElementById('oldTax'),
+                surcharge: document.getElementById('oldSurcharge'),
+                cess: document.getElementById('oldCess'),
+                totalTax: document.getElementById('oldTotalTax'),
+                netSalary: document.getElementById('oldNetSalary'),
+                yearlyTax: document.getElementById('oldYearlyTax'),
+                monthlyGross: document.getElementById('oldMonthlyGross'),
+                monthlyTax: document.getElementById('oldMonthlyTax'),
+                monthlyTakeHome: document.getElementById('oldMonthlyTakeHome'),
+                tableContainer: document.getElementById('oldSlabTableContainer'),
+                rec: document.getElementById('oldRec')
+            };
+
+            const newRegimeDisplays = {
+                taxableIncome: document.getElementById('newTaxableIncome'),
+                tax: document.getElementById('newTax'),
+                surcharge: document.getElementById('newSurcharge'),
+                cess: document.getElementById('newCess'),
+                totalTax: document.getElementById('newTotalTax'),
+                netSalary: document.getElementById('newNetSalary'),
+                yearlyTax: document.getElementById('newYearlyTax'),
+                monthlyGross: document.getElementById('newMonthlyGross'),
+                monthlyTax: document.getElementById('newMonthlyTax'),
+                monthlyTakeHome: document.getElementById('newMonthlyTakeHome'),
+                tableContainer: document.getElementById('newSlabTableContainer'),
+                rec: document.getElementById('newRec')
+            };
+
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+
+            const formatToRupee = (num) => `₹ ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
+            const calculate = () => {
+                const basicSalary = Number(allInputs.basicSalary.value) || 0;
+                if (basicSalary === 0) {
+                     // Using a custom modal/alert would be better, but for simplicity:
+                    alert('Please enter a Basic Salary to calculate.');
+                    return;
+                }
+                
+                const hraReceived = Number(allInputs.hra.value) || 0;
+                const otherAllowances = Number(allInputs.otherAllowances.value) || 0;
+                const ltaExemption = Number(allInputs.lta.value) || 0;
+
+                // --- Common Calculations ---
+                const grossSalary = basicSalary + hraReceived + otherAllowances;
+                const employeePF = Math.min(basicSalary * 0.12, 21600); // 12% of basic, capped at 1800/month
+                const employerPF = Math.min(basicSalary * 0.12, 21600);
+                const professionalTax = 2400;
+
+                readOnlyDisplays.grossSalary.value = formatToRupee(grossSalary);
+                readOnlyDisplays.employeePF.value = formatToRupee(employeePF);
+                readOnlyDisplays.employerPF.value = formatToRupee(employerPF);
+                readOnlyDisplays.professionalTax.value = formatToRupee(professionalTax);
+                
+                grossSalaryDisplay.container.classList.remove('hidden');
+                grossSalaryDisplay.value.textContent = formatToRupee(grossSalary);
+
+                // --- Old Regime Calculation ---
+                const rentPaid = Number(allInputs.rentPaid.value) || 0;
+                const hraExemption = Math.max(0, Math.min(
+                    hraReceived,
+                    rentPaid - (basicSalary * 0.10),
+                    allInputs.isMetro.checked ? (basicSalary * 0.50) : (basicSalary * 0.40)
+                ));
+
+                const salaryAfterExemptions = grossSalary - hraExemption - ltaExemption;
+                
+                const deductions = {
+                    standard: 50000,
+                    '80c': Math.min((Number(allInputs.deduction80c.value) || 0) + employeePF, 150000),
+                    nps: Math.min(Number(allInputs.nps80ccd.value) || 0, 50000),
+                    '80d': Math.min(Number(allInputs.deduction80d.value) || 0, 25000), // Assuming non-senior
+                    homeLoan: Math.min(Number(allInputs.homeLoanInterest.value) || 0, 200000),
+                    eduLoan: Number(allInputs.educationLoanInterest.value) || 0,
+                    savings: Math.min(Number(allInputs.savingsInterest.value) || 0, 10000),
+                    donations: Number(allInputs.donations80g.value) || 0, // Note: 80G has complex rules, simplifying here
+                    profTax: professionalTax
+                };
+
+                const totalDeductionsOld = Object.values(deductions).reduce((sum, val) => sum + val, 0);
+                const oldTaxableIncome = Math.max(0, salaryAfterExemptions - totalDeductionsOld + deductions.profTax);
+                
+                const oldResult = calculateTax(oldTaxableIncome, 'old');
+                const oldNetSalary = grossSalary - employeePF - professionalTax - oldResult.totalTax;
+                
+                updateResultUI(oldRegimeDisplays, oldTaxableIncome, oldResult, oldNetSalary, {
+                    monthlyGross: grossSalary / 12,
+                    monthlyTax: oldResult.totalTax / 12,
+                    monthlyTakeHome: oldNetSalary / 12
+                });
+                generateSlabTable(oldRegimeDisplays.tableContainer, oldTaxableIncome, 'old');
+
+                // --- New Regime Calculation ---
+                // Employer's NPS contribution is also deductible under new regime
+                const newDeductions = 50000;
+                const newTaxableIncome = Math.max(0, grossSalary - newDeductions);
+                
+                const newResult = calculateTax(newTaxableIncome, 'new');
+                const newNetSalary = grossSalary - employeePF - professionalTax - newResult.totalTax;
+                
+                updateResultUI(newRegimeDisplays, newTaxableIncome, newResult, newNetSalary, {
+                    monthlyGross: grossSalary / 12,
+                    monthlyTax: newResult.totalTax / 12,
+                    monthlyTakeHome: newNetSalary / 12
+                });
+                generateSlabTable(newRegimeDisplays.tableContainer, newTaxableIncome, 'new');
+                
+                // --- Compare and highlight winner ---
+                updateWinner(oldResult.totalTax, newResult.totalTax);
+            };
+
+            const updateResultUI = (ui, taxableIncome, taxResult, netSalary, monthlyValues) => {
+                ui.taxableIncome.textContent = formatToRupee(taxableIncome);
+                ui.tax.textContent = formatToRupee(taxResult.tax);
+                ui.surcharge.textContent = formatToRupee(taxResult.surcharge);
+                ui.cess.textContent = formatToRupee(taxResult.cess);
+                ui.totalTax.textContent = formatToRupee(taxResult.totalTax);
+                ui.netSalary.textContent = formatToRupee(netSalary);
+                ui.yearlyTax.textContent = formatToRupee(taxResult.totalTax);
+                ui.monthlyGross.textContent = formatToRupee(monthlyValues.monthlyGross);
+                ui.monthlyTax.textContent = formatToRupee(monthlyValues.monthlyTax);
+                ui.monthlyTakeHome.textContent = formatToRupee(monthlyValues.monthlyTakeHome);
+            };
+
+            const calculateTax = (income, regime) => {
+                let tax = 0;
+                let rebateLimit, slabs;
+
+                if (regime === 'old') {
+                    rebateLimit = 500000;
+                    slabs = [
+                        { limit: 250000, rate: 0 },
+                        { limit: 500000, rate: 0.05 },
+                        { limit: 1000000, rate: 0.20 },
+                        { limit: Infinity, rate: 0.30 }
+                    ];
+                } else { // New Regime
+                    rebateLimit = 700000;
+                    slabs = [
+                        { limit: 300000, rate: 0 },
+                        { limit: 600000, rate: 0.05 },
+                        { limit: 900000, rate: 0.10 },
+                        { limit: 1200000, rate: 0.15 },
+                        { limit: 1500000, rate: 0.20 },
+                        { limit: Infinity, rate: 0.30 }
+                    ];
+                }
+
+                if (income <= rebateLimit) {
+                    tax = 0;
+                } else {
+                    let remainingIncome = income;
+                    let lastLimit = 0;
+                    for (const slab of slabs) {
+                        if (remainingIncome <= 0) break;
+                        const taxableInSlab = Math.min(remainingIncome, slab.limit === Infinity ? Infinity : slab.limit - lastLimit);
+                        tax += taxableInSlab * slab.rate;
+                        remainingIncome -= taxableInSlab;
+                        lastLimit = slab.limit;
+                    }
+                }
+                
+                let surcharge = 0;
+                if (income > 5000000) {
+                    if (income <= 10000000) surcharge = tax * 0.10;
+                    else if (income <= 20000000) surcharge = tax * 0.15;
+                    else if (income <= 50000000) surcharge = tax * 0.25;
+                    else surcharge = tax * 0.37;
+                }
+                
+                const totalTaxBeforeCess = tax + surcharge;
+                const cess = totalTaxBeforeCess * 0.04;
+                const totalTax = totalTaxBeforeCess + cess;
+                
+                return { tax, surcharge, cess, totalTax };
+            };
+            
+            const generateSlabTable = (container, income, regime) => {
+                container.innerHTML = '';
+                
+                let rebateLimit, slabs;
+                if (regime === 'old') {
+                    rebateLimit = 500000;
+                    slabs = [
+                        { text: 'Up to ₹2,50,000', limit: 250000, rate: 0 },
+                        { text: '₹2,50,001 - ₹5,00,000', limit: 500000, rate: 0.05 },
+                        { text: '₹5,00,001 - ₹10,00,000', limit: 1000000, rate: 0.20 },
+                        { text: 'Above ₹10,00,000', limit: Infinity, rate: 0.30 }
+                    ];
+                } else { // New Regime
+                    rebateLimit = 700000;
+                    slabs = [
+                        { text: 'Up to ₹3,00,000', limit: 300000, rate: 0 },
+                        { text: '₹3,00,001 - ₹6,00,000', limit: 600000, rate: 0.05 },
+                        { text: '₹6,00,001 - ₹9,00,000', limit: 900000, rate: 0.10 },
+                        { text: '₹9,00,001 - ₹12,00,000', limit: 1200000, rate: 0.15 },
+                        { text: '₹12,00,001 - ₹15,00,000', limit: 1500000, rate: 0.20 },
+                        { text: 'Above ₹15,00,000', limit: Infinity, rate: 0.30 }
+                    ];
+                }
+
+                const table = document.createElement('table');
+                table.className = 'w-full text-sm mt-4 border-collapse';
+                container.appendChild(table);
+
+                table.innerHTML = `
+                    <thead class="bg-slate-200">
+                        <tr>
+                            <th class="p-2 text-left font-semibold text-slate-700 rounded-tl-lg">Income Slab (@Rate)</th>
+                            <th class="p-2 text-right font-semibold text-slate-700">Taxable</th>
+                            <th class="p-2 text-right font-semibold text-slate-700 rounded-tr-lg">Tax</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot></tfoot>
+                `;
+
+                const tbody = table.querySelector('tbody');
+                const tfoot = table.querySelector('tfoot');
+                
+                if (income <= 0) {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `<td colspan="3" class="p-2 text-center text-slate-500">Enter income details to see breakdown.</td>`;
+                    return;
+                }
+
+                if (income <= rebateLimit) {
+                    const row = tbody.insertRow();
+                    row.className = 'border-b border-slate-200';
+                    row.innerHTML = `<td colspan="3" class="p-4 text-center text-green-700 font-semibold">No tax payable due to Rebate under Section 87A.</td>`;
+                    return;
+                }
+                
+                let remainingIncome = income;
+                let lastLimit = 0;
+                let totalTaxCalculated = 0;
+
+                for (const slab of slabs) {
+                    if (remainingIncome <= 0) break;
+                    
+                    const taxableInSlab = Math.min(remainingIncome, slab.limit === Infinity ? Infinity : slab.limit - lastLimit);
+                    
+                    if (taxableInSlab <= 0) {
+                        lastLimit = slab.limit;
+                        continue;
+                    };
+
+                    const taxInSlab = taxableInSlab * slab.rate;
+                    totalTaxCalculated += taxInSlab;
+                    
+                    const row = tbody.insertRow();
+                    row.className = 'border-b border-slate-200';
+                    row.innerHTML = `
+                        <td class="p-2">${slab.text} <span class="text-slate-500">(${slab.rate * 100}%)</span></td>
+                        <td class="p-2 text-right">${formatToRupee(taxableInSlab)}</td>
+                        <td class="p-2 text-right">${formatToRupee(taxInSlab)}</td>
+                    `;
+                    
+                    remainingIncome -= taxableInSlab;
+                    lastLimit = slab.limit;
+                }
+
+                tfoot.innerHTML = `
+                    <tr class="font-bold bg-slate-100">
+                        <td colspan="2" class="p-2 text-right rounded-bl-lg">Total Income Tax</td>
+                        <td class="p-2 text-right rounded-br-lg">${formatToRupee(totalTaxCalculated)}</td>
+                    </tr>
+                `;
+            };
+            
+            const updateWinner = (oldTax, newTax) => {
+                oldRegimeDisplays.rec.classList.add('hidden');
+                newRegimeDisplays.rec.classList.add('hidden');
+                
+                if (newTax < oldTax) {
+                    newRegimeDisplays.rec.classList.remove('hidden');
+                } else if (oldTax < newTax) {
+                    oldRegimeDisplays.rec.classList.remove('hidden');
+                } else {
+                    // If equal, recommend the new regime for simplicity
+                    newRegimeDisplays.rec.classList.remove('hidden');
+                }
+            };
+            
+            const reset = () => {
+                Object.values(allInputs).forEach(input => {
+                    if(input.type === 'checkbox') input.checked = false;
+                    else input.value = '';
+                });
+                Object.values(readOnlyDisplays).forEach(input => input.value = '');
+                
+                grossSalaryDisplay.container.classList.add('hidden');
+                grossSalaryDisplay.value.textContent = '₹ 0';
+                
+                [oldRegimeDisplays, newRegimeDisplays].forEach(uiSet => {
+                    updateResultUI(uiSet, 0, { tax: 0, surcharge: 0, cess: 0, totalTax: 0 }, 0, { monthlyGross: 0, monthlyTax: 0, monthlyTakeHome: 0 });
+                    uiSet.tableContainer.innerHTML = '';
+                    uiSet.rec.classList.add('hidden');
+                });
+                
+                allInputs.basicSalary.focus();
+            };
+
+            calculateBtn.addEventListener('click', calculate);
+            resetBtn.addEventListener('click', reset);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
